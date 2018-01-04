@@ -67,6 +67,9 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->widgetPlotWind1->xAxis->setTickVector(QVector<double>() << 20000 << 15000 << 10000 << 5000 );
   ui->widgetPlotWind1->xAxis->setTickVectorLabels(QVector<QString>() << "20" << "15" << "10" << "5");
 */
+
+  ui->widgetPlotWind2->xAxis->setTickLabelType(QCPAxis::ltDateTime);
+  ui->widgetPlotWind2->xAxis->setDateTimeFormat("hh:mm:ss");
 }
 
 MainWindow::~MainWindow()
@@ -87,10 +90,19 @@ void MainWindow::readyRead()
 
   if (m_SerialPort.canReadLine())
   {
-    QTime time(QTime::currentTime());
-    float t = (float)time.msecsSinceStartOfDay() - (float)m_startTime.msecsSinceStartOfDay();
-    qDebug() << t;
-    t=t/1000;
+    //QTime time (QTime::currentTime());
+    // float t = (float)time.msecsSinceStartOfDay()/1000;// - (float)m_startTime.msecsSinceStartOfDay();
+
+    // qDebug() << "First t = " << t;
+
+
+    QDateTime timeDT(QDateTime::currentDateTimeUtc());
+    // qDebug() << timeDT.toString("hh:mm:ss");
+
+    float t = (float)timeDT.time().msecsSinceStartOfDay()/1000;
+    // qDebug() << "Second t = " << t;
+
+
     m_SerialPort.readLine(data,1024);
     if (data[0] == '\2')
     {
@@ -310,7 +322,6 @@ void MainWindow::settingsSlot()
 
 void MainWindow::clearPlot()
 {
-  m_startTime = QTime::currentTime();
 
   ui->widgetPlotWind1->graph(0)->clearData();
   ui->widgetPlotWind1->graph(1)->clearData();

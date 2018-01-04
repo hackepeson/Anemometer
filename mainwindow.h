@@ -27,7 +27,6 @@ private:
   bool m_bUpdateValues;
   DialogSettings m_ds;
   int m_dPlotTimeSec;
-  QTime m_startTime;
 
 
 private slots:
