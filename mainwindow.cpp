@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
   m_bUpdateValues = true;
   m_dPlotTimeSec = m_ds.getPlotTime();
+  m_dYScale = 0;
 
 
 
@@ -73,6 +74,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
   ui->widgetPlotWind2->xAxis->setTickLabelType(QCPAxis::ltDateTime);
   ui->widgetPlotWind2->xAxis->setDateTimeFormat("hh:mm:ss");
+
+  if (m_ds.isLegendChecked())
+  {
+    ui->widgetPlotWind1->legend->setVisible(true);
+    ui->widgetPlotWind2->legend->setVisible(true);
+  }
+  else
+  {
+    ui->widgetPlotWind1->legend->setVisible(false);
+    ui->widgetPlotWind2->legend->setVisible(false);
+  }
 }
 
 MainWindow::~MainWindow()
@@ -93,85 +105,108 @@ void MainWindow::readyRead()
 
   if (m_SerialPort.canReadLine())
   {
-    //QTime time (QTime::currentTime());
-    // float t = (float)time.msecsSinceStartOfDay()/1000;// - (float)m_startTime.msecsSinceStartOfDay();
-
-    // qDebug() << "First t = " << t;
-
 
     QDateTime timeDT(QDateTime::currentDateTimeUtc());
-    // qDebug() << timeDT.toString("hh:mm:ss");
+
 
     float t = (float)timeDT.time().msecsSinceStartOfDay()/1000;
-    // qDebug() << "Second t = " << t;
 
 
-    m_SerialPort.readLine(data,1024);
-    if (data[0] == '\2')
+    int lineLength = m_SerialPort.readLine(data,1024);
+    data[lineLength] = '\0';
+    qDebug() << lineLength << " " << data;
+
+    // Search for STX in the string
+    char* pch;
+    pch = strchr(data,'\2');
+
+    while (pch != NULL)
     {
-      memset(crossSpeed, 0, 8);
-      memset(headSpeed, 0, 8);
-
-      memcpy(&sensorID, &data[1],1);
-      memcpy(crossSpeed, &data[3],7);
-      memcpy(headSpeed, &data[11],7);
-      memcpy(unit, &data[19],1);
-      memcpy(status, &data[21],2);
-
-      char WindID1;
-      char WindID2;
-
-      switch (ui->comboBoxWind1IDSelect->currentIndex())
+      char tmpStr[128];
+      memcpy(tmpStr, &data[pch-data], 28);
+      pch=strchr(pch+1,'\2');
+      if (tmpStr[0] == '\2')
       {
-      case 0: WindID1 = 'A';break;
-      case 1: WindID1 = 'B';break;
-      case 2: WindID1 = 'C';break;
-      }
+        memset(crossSpeed, 0, 8);
+        memset(headSpeed, 0, 8);
 
-      switch (ui->comboBoxWind2IDSelect->currentIndex())
-      {
-      case 0: WindID2 = 'A';break;
-      case 1: WindID2 = 'B';break;
-      case 2: WindID2 = 'C';break;
-      }
+        memcpy(&sensorID, &tmpStr[1],1);
+        memcpy(crossSpeed, &tmpStr[3],7);
+        memcpy(headSpeed, &tmpStr[11],7);
+        memcpy(unit, &tmpStr[19],1);
+        memcpy(status, &tmpStr[21],2);
 
+        char WindID1;
+        char WindID2;
 
-
-      if (m_bUpdateValues)
-      {
-        if (sensorID == WindID1)
+        switch (ui->comboBoxWind1IDSelect->currentIndex())
         {
-          ui->lcdNumberHeadWind1->display(QString(crossSpeed).toFloat());
-          ui->lcdNumberCrossWind1->display(-QString(headSpeed).toFloat());
-          QString ID(sensorID);
-          ui->labelSensorWind1->setText(ID);
-          ui->widgetPlotWind1->graph(0)->addData((float)t, -QString(headSpeed).toFloat());
-          ui->widgetPlotWind1->graph(1)->addData((float)t, QString(crossSpeed).toFloat());
-          ui->widgetPlotWind1->yAxis->setRange(-20,20);
-          ui->widgetPlotWind1->xAxis->setRange((float)t,m_dPlotTimeSec, Qt::AlignRight);
-          ui->widgetPlotWind1->replot();
+        case 0: WindID1 = 'A';break;
+        case 1: WindID1 = 'B';break;
+        case 2: WindID1 = 'C';break;
         }
-        if (sensorID == WindID2)
-        {
-          ui->lcdNumberHeadWind2->display(QString(crossSpeed).toFloat());
-          ui->lcdNumberCrossWind2->display(-QString(headSpeed).toFloat());
-          QString ID(sensorID);
-          ui->labelSensorWind2->setText(ID);
-          ui->widgetPlotWind2->graph(0)->addData((float)t, -QString(headSpeed).toFloat());
-          ui->widgetPlotWind2->graph(1)->addData((float)t, QString(crossSpeed).toFloat());
-          ui->widgetPlotWind2->yAxis->setRange(-20,20);
-          ui->widgetPlotWind2->xAxis->setRange((float)t,m_dPlotTimeSec, Qt::AlignRight);
-          ui->widgetPlotWind2->replot();
-        }
-      }
-      QString text = QString(data).simplified();
-      ui->textEditSerialInput->append(text);
-    }
-    else
-    {
-      m_SerialPort.readAll();
 
+        switch (ui->comboBoxWind2IDSelect->currentIndex())
+        {
+        case 0: WindID2 = 'A';break;
+        case 1: WindID2 = 'B';break;
+        case 2: WindID2 = 'C';break;
+        }
+
+
+
+        if (m_bUpdateValues)
+        {
+          if (sensorID == WindID1)
+          {
+            ui->lcdNumberHeadWind1->display(QString(crossSpeed).toFloat());
+            ui->lcdNumberCrossWind1->display(-QString(headSpeed).toFloat());
+            QString ID(sensorID);
+            ui->labelSensorWind1->setText(ID);
+            ui->widgetPlotWind1->graph(0)->addData((float)t, -QString(headSpeed).toFloat());
+            ui->widgetPlotWind1->graph(1)->addData((float)t, QString(crossSpeed).toFloat());
+            if (m_dYScale == 0)
+            {
+              ui->widgetPlotWind1->rescaleAxes();
+            }
+            else
+            {
+              ui->widgetPlotWind1->yAxis->setRange(-m_dYScale,m_dYScale);
+            }
+            ui->widgetPlotWind1->xAxis->setRange((float)t,m_dPlotTimeSec, Qt::AlignRight);
+            ui->widgetPlotWind1->replot();
+          }
+          if (sensorID == WindID2)
+          {
+            ui->lcdNumberHeadWind2->display(QString(crossSpeed).toFloat());
+            ui->lcdNumberCrossWind2->display(-QString(headSpeed).toFloat());
+            QString ID(sensorID);
+            ui->labelSensorWind2->setText(ID);
+            ui->widgetPlotWind2->graph(0)->addData((float)t, -QString(headSpeed).toFloat());
+            ui->widgetPlotWind2->graph(1)->addData((float)t, QString(crossSpeed).toFloat());
+
+            if (m_dYScale == 0)
+            {
+              ui->widgetPlotWind2->rescaleAxes();
+            }
+            else
+            {
+              ui->widgetPlotWind2->yAxis->setRange(-m_dYScale,m_dYScale);
+            }
+            ui->widgetPlotWind2->xAxis->setRange((float)t,m_dPlotTimeSec, Qt::AlignRight);
+            ui->widgetPlotWind2->replot();
+          }
+        }
+        QString text = QString(data).simplified();
+        ui->textEditSerialInput->append(text);
+      }
+      else
+      {
+        m_SerialPort.readAll();
+
+      }
     }
+
   }
 }
 
@@ -305,6 +340,7 @@ void MainWindow::settingsSlot()
     ui->widgetPlotWind2->graph(0)->setScatterStyle(ss);
     ui->widgetPlotWind2->graph(1)->setScatterStyle(ss);
     m_dPlotTimeSec = m_ds.getPlotTime();
+    m_dYScale = m_ds.getYScale();
 
     if (m_ds.isLegendChecked())
     {

@@ -30,3 +30,8 @@ int DialogSettings::getPlotTime()
   return ui->spinBoxPlotTime->value();
 
 }
+
+int DialogSettings::getYScale()
+{
+  return ui->spinBoxYAxesScale->value();
+}

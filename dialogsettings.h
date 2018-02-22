@@ -17,6 +17,7 @@ public:
   bool isLegendChecked();
   bool isDataMarksChecked();
   int getPlotTime();
+  int getYScale();
 
 private:
   Ui::DialogSettings *ui;
