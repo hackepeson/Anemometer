@@ -68,6 +68,9 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->widgetPlotWind1->xAxis->setTickVectorLabels(QVector<QString>() << "20" << "15" << "10" << "5");
 */
 
+  ui->widgetPlotWind1->xAxis->setTickLabelType(QCPAxis::ltDateTime);
+  ui->widgetPlotWind1->xAxis->setDateTimeFormat("hh:mm:ss");
+
   ui->widgetPlotWind2->xAxis->setTickLabelType(QCPAxis::ltDateTime);
   ui->widgetPlotWind2->xAxis->setDateTimeFormat("hh:mm:ss");
 }
@@ -139,10 +142,10 @@ void MainWindow::readyRead()
         if (sensorID == WindID1)
         {
           ui->lcdNumberHeadWind1->display(QString(crossSpeed).toFloat());
-          ui->lcdNumberCrossWind1->display(QString(headSpeed).toFloat());
+          ui->lcdNumberCrossWind1->display(-QString(headSpeed).toFloat());
           QString ID(sensorID);
           ui->labelSensorWind1->setText(ID);
-          ui->widgetPlotWind1->graph(0)->addData((float)t, QString(headSpeed).toFloat());
+          ui->widgetPlotWind1->graph(0)->addData((float)t, -QString(headSpeed).toFloat());
           ui->widgetPlotWind1->graph(1)->addData((float)t, QString(crossSpeed).toFloat());
           ui->widgetPlotWind1->yAxis->setRange(-20,20);
           ui->widgetPlotWind1->xAxis->setRange((float)t,m_dPlotTimeSec, Qt::AlignRight);
@@ -151,10 +154,10 @@ void MainWindow::readyRead()
         if (sensorID == WindID2)
         {
           ui->lcdNumberHeadWind2->display(QString(crossSpeed).toFloat());
-          ui->lcdNumberCrossWind2->display(QString(headSpeed).toFloat());
+          ui->lcdNumberCrossWind2->display(-QString(headSpeed).toFloat());
           QString ID(sensorID);
           ui->labelSensorWind2->setText(ID);
-          ui->widgetPlotWind2->graph(0)->addData((float)t, QString(headSpeed).toFloat());
+          ui->widgetPlotWind2->graph(0)->addData((float)t, -QString(headSpeed).toFloat());
           ui->widgetPlotWind2->graph(1)->addData((float)t, QString(crossSpeed).toFloat());
           ui->widgetPlotWind2->yAxis->setRange(-20,20);
           ui->widgetPlotWind2->xAxis->setRange((float)t,m_dPlotTimeSec, Qt::AlignRight);
