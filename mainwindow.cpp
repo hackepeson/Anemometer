@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
   m_bUpdateValues = true;
   m_dPlotTimeSec = m_ds.getPlotTime();
   m_dYScale = 0;
+  m_bDebugOutput = false;
 
 
 
@@ -197,8 +198,11 @@ void MainWindow::readyRead()
             ui->widgetPlotWind2->replot();
           }
         }
-        QString text = QString(data).simplified();
-        ui->textEditSerialInput->append(text);
+        if (m_bDebugOutput)
+        {
+          QString text = QString(data).simplified();
+          ui->textEditSerialInput->append(text);
+        }
       }
       else
       {

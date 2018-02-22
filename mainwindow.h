@@ -29,6 +29,8 @@ private:
   int m_dPlotTimeSec;
   int m_dYScale;
 
+  bool m_bDebugOutput;
+
 
 private slots:
   void readyRead();
