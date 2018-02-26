@@ -6,6 +6,7 @@
 #include <QActionGroup>
 #include "dialogsettings.h"
 #include <QTime>
+#include "qcustomplot.h"
 
 namespace Ui {
 class MainWindow;
@@ -25,11 +26,20 @@ private:
   QActionGroup* m_pComPortActionGroup;
 
   bool m_bUpdateValues;
+  bool m_bLockLCD;
   DialogSettings m_ds;
   int m_dPlotTimeSec;
   int m_dYScale;
 
   bool m_bDebugOutput;
+
+  float m_fT0;
+
+  QCPItemText* m_textLabelPlot1;
+  QCPItemLine* m_arrowPlot1;
+
+  QCPItemText* m_textLabelPlot2;
+  QCPItemLine* m_arrowPlot2;
 
 
 private slots:
@@ -40,7 +50,13 @@ private slots:
   void settingsSlot();
   void freezeButtonSlot(bool ctrl);
   void clearPlot();
+  void resynchronize();
+  void addT0Marker();
+  void removeT0Marker();
+  void exportToPDF();
 
 };
 
 #endif // MAINWINDOW_H
+
+

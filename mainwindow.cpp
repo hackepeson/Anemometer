@@ -4,6 +4,16 @@
 #include <QSerialPortInfo>
 #include <QDebug>
 #include <QMessageBox>
+#include <QTimer>
+#include <QFileDialog>
+
+void processEventQueueSleep(int msec)
+{
+    QEventLoop loop;
+    QTimer::singleShot(msec,&loop,SLOT(quit()));
+    loop.exec();
+}
+
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
@@ -12,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->setupUi(this);
 
   m_bUpdateValues = true;
+  m_bLockLCD = false;
   m_dPlotTimeSec = m_ds.getPlotTime();
   m_dYScale = 0;
   m_bDebugOutput = false;
@@ -26,6 +37,10 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->actionPlot, SIGNAL(triggered(bool)), SLOT(settingsSlot()));
 
   connect(ui->actionClear_Plot, SIGNAL(triggered(bool)), SLOT(clearPlot()));
+
+  connect(ui->actionResynchronize, SIGNAL(triggered(bool)), SLOT(resynchronize()));
+
+  connect(ui->actionPDF, SIGNAL(triggered(bool)), SLOT(exportToPDF()));
 
   m_pComPortActionGroup = new QActionGroup(this);
   updateComportList();
@@ -86,6 +101,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->widgetPlotWind1->legend->setVisible(false);
     ui->widgetPlotWind2->legend->setVisible(false);
   }
+
 }
 
 MainWindow::~MainWindow()
@@ -160,9 +176,15 @@ void MainWindow::readyRead()
         {
           if (sensorID == WindID1)
           {
-            ui->lcdNumberHeadWind1->display(QString(crossSpeed).toFloat());
-            ui->lcdNumberCrossWind1->display(-QString(headSpeed).toFloat());
+            if (!m_bLockLCD)
+            {
+              ui->lcdNumberHeadWind1->display(QString(crossSpeed).toFloat());
+              ui->lcdNumberCrossWind1->display(-QString(headSpeed).toFloat());
+            }
+
             QString ID(sensorID);
+            ui->widgetPlotWind1->graph(0)->removeDataBefore(t-m_dPlotTimeSec);
+            ui->widgetPlotWind1->graph(1)->removeDataBefore(t-m_dPlotTimeSec);
             ui->labelSensorWind1->setText(ID);
             ui->widgetPlotWind1->graph(0)->addData((float)t, -QString(headSpeed).toFloat());
             ui->widgetPlotWind1->graph(1)->addData((float)t, QString(crossSpeed).toFloat());
@@ -175,13 +197,20 @@ void MainWindow::readyRead()
               ui->widgetPlotWind1->yAxis->setRange(-m_dYScale,m_dYScale);
             }
             ui->widgetPlotWind1->xAxis->setRange((float)t,m_dPlotTimeSec, Qt::AlignRight);
+            ui->widgetPlotWind1->setTitle(ID);
             ui->widgetPlotWind1->replot();
           }
           if (sensorID == WindID2)
           {
-            ui->lcdNumberHeadWind2->display(QString(crossSpeed).toFloat());
-            ui->lcdNumberCrossWind2->display(-QString(headSpeed).toFloat());
+            if (!m_bLockLCD)
+            {
+              ui->lcdNumberHeadWind2->display(QString(crossSpeed).toFloat());
+              ui->lcdNumberCrossWind2->display(-QString(headSpeed).toFloat());
+            }
+
             QString ID(sensorID);
+            ui->widgetPlotWind2->graph(0)->removeDataBefore(t-m_dPlotTimeSec);
+            ui->widgetPlotWind2->graph(1)->removeDataBefore(t-m_dPlotTimeSec);
             ui->labelSensorWind2->setText(ID);
             ui->widgetPlotWind2->graph(0)->addData((float)t, -QString(headSpeed).toFloat());
             ui->widgetPlotWind2->graph(1)->addData((float)t, QString(crossSpeed).toFloat());
@@ -195,6 +224,7 @@ void MainWindow::readyRead()
               ui->widgetPlotWind2->yAxis->setRange(-m_dYScale,m_dYScale);
             }
             ui->widgetPlotWind2->xAxis->setRange((float)t,m_dPlotTimeSec, Qt::AlignRight);
+            ui->widgetPlotWind2->setTitle(ID);
             ui->widgetPlotWind2->replot();
           }
         }
@@ -294,13 +324,23 @@ void MainWindow::freezeButtonSlot(bool ctrl)
 {
   if (ctrl)
   {
-    m_bUpdateValues = false;
+    QDateTime timeDT(QDateTime::currentDateTimeUtc());
+    m_fT0 = (float)timeDT.time().msecsSinceStartOfDay()/1000;
+    m_bLockLCD = true;
+    addT0Marker();
+    ui->pushButtonFreeze->setDisabled(true);
     ui->pushButtonFreeze->setText("Run");
+    processEventQueueSleep(5000);
+    m_bUpdateValues = false;
+    ui->pushButtonFreeze->setDisabled(false);
+
   }
   else
   {
     m_bUpdateValues = true;
     ui->pushButtonFreeze->setText("Stop");
+    removeT0Marker();
+    m_bLockLCD = false;
   }
 }
 
@@ -371,5 +411,110 @@ void MainWindow::clearPlot()
 
   ui->widgetPlotWind2->graph(0)->clearData();
   ui->widgetPlotWind2->graph(1)->clearData();
+
+}
+
+void MainWindow::resynchronize()
+{
+  qDebug() << "Try resynchronize";
+  for (int i = 0; i < 100; i++)
+  {
+    m_SerialPort.write("*");
+    processEventQueueSleep(10);
+  }
+
+  processEventQueueSleep(1000);
+
+  for (int i = 0; i < 100; i++)
+  {
+    m_SerialPort.write("Q\r\n");
+    processEventQueueSleep(10);
+  }
+}
+
+
+void MainWindow::addT0Marker()
+{
+
+  // Add to to Wind1 plot
+  // add the text label at the top:
+  m_textLabelPlot1 = new QCPItemText(ui->widgetPlotWind1);
+  m_textLabelPlot1->setPositionAlignment(Qt::AlignTop|Qt::AlignHCenter);
+  m_textLabelPlot1->position->setType(QCPItemPosition::ptAxisRectRatio);
+  m_textLabelPlot1->position->setCoords(0.5, 0); // place position at center/top of axis rect
+  m_textLabelPlot1->setText("Stop time");
+  m_textLabelPlot1->setFont(QFont(font().family(), 16)); // make font a bit larger
+  m_textLabelPlot1->setPen(QPen(Qt::black)); // show black border around text
+
+  // add the arrow:
+  m_arrowPlot1 = new QCPItemLine(ui->widgetPlotWind1);
+  m_arrowPlot1->start->setParentAnchor(m_textLabelPlot1->bottom);
+  m_arrowPlot1->end->setCoords(m_fT0, 0); // point to (4, 1.6) in x-y-plot coordinates
+  m_arrowPlot1->setHead(QCPLineEnding::esSpikeArrow);
+  ui->widgetPlotWind1->replot();
+
+
+  // Add to to Wind2 plot
+  // add the text label at the top:
+  m_textLabelPlot2 = new QCPItemText(ui->widgetPlotWind2);
+  m_textLabelPlot2->setPositionAlignment(Qt::AlignTop|Qt::AlignHCenter);
+  m_textLabelPlot2->position->setType(QCPItemPosition::ptAxisRectRatio);
+  m_textLabelPlot2->position->setCoords(0.5, 0); // place position at center/top of axis rect
+  m_textLabelPlot2->setText("Stop time");
+  m_textLabelPlot2->setFont(QFont(font().family(), 16)); // make font a bit larger
+  m_textLabelPlot2->setPen(QPen(Qt::black)); // show black border around text
+
+  // add the arrow:
+  m_arrowPlot2 = new QCPItemLine(ui->widgetPlotWind2);
+  m_arrowPlot2->start->setParentAnchor(m_textLabelPlot2->bottom);
+  m_arrowPlot2->end->setCoords(m_fT0, 0); // point to (4, 1.6) in x-y-plot coordinates
+  m_arrowPlot2->setHead(QCPLineEnding::esSpikeArrow);
+
+  ui->widgetPlotWind2->replot();
+
+}
+
+void MainWindow::removeT0Marker()
+{
+  ui->widgetPlotWind1->removeItem(m_textLabelPlot1);
+  ui->widgetPlotWind1->removeItem(m_arrowPlot1);
+  delete m_textLabelPlot1;
+  delete m_arrowPlot1;
+  ui->widgetPlotWind1->replot();
+
+  ui->widgetPlotWind2->removeItem(m_textLabelPlot2);
+  ui->widgetPlotWind2->removeItem(m_arrowPlot2);
+  delete m_textLabelPlot2;
+  delete m_arrowPlot2;
+  ui->widgetPlotWind2->replot();
+}
+
+void MainWindow::exportToPDF()
+{
+  static QString pdfFileName;
+
+  QString fileName = QFileDialog::getSaveFileName(this, tr("Save to PDF"), pdfFileName, tr("PDF Files (*.pdf)"));
+
+  QString plotID1 = ui->widgetPlotWind1->title();
+  QString plotID2 = ui->widgetPlotWind2->title();
+
+
+  if (!fileName.isEmpty())
+  {
+
+    QStringList qsl =  fileName.split(".pdf");
+
+
+    QString fileName1 = qsl[0];
+    fileName1.append(plotID1);
+    fileName1.append(".pdf");
+    ui->widgetPlotWind1->savePdf(fileName1);
+
+    QString fileName2 = qsl[0];
+    fileName2.append(plotID2);
+    fileName2.append(".pdf");
+    ui->widgetPlotWind2->savePdf(fileName2);
+
+  }
 
 }
