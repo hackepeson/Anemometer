@@ -22,7 +22,7 @@
         <string>Legend</string>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -100,8 +100,6 @@
     </widget>
    </item>
   </layout>
-  <zorder>buttonBox</zorder>
-  <zorder>label_2</zorder>
  </widget>
  <resources/>
  <connections>

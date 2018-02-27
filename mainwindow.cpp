@@ -101,6 +101,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->widgetPlotWind1->legend->setVisible(false);
     ui->widgetPlotWind2->legend->setVisible(false);
   }
+  ui->widgetPlotWind1->replot();
+  ui->widgetPlotWind2->replot();
+
 
 }
 
