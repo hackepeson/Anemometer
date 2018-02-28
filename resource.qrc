@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>wind.png</file>
+        <file>wind_direction_indicator.png</file>
+    </qresource>
+</RCC>

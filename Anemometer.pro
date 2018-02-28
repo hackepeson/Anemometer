@@ -43,3 +43,6 @@ HEADERS += \
 FORMS += \
         mainwindow.ui \
     dialogsettings.ui
+
+RESOURCES += \
+    resource.qrc
