@@ -27,6 +27,9 @@ MainWindow::MainWindow(QWidget *parent) :
   m_dYScale = 0;
   m_bDebugOutput = false;
 
+  m_pElapsedTimer = new QElapsedTimer();
+  m_pElapsedTimer->start();
+
 
 
   connect(&m_SerialPort, SIGNAL(readyRead()), SLOT(readyRead()));
@@ -70,8 +73,9 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->widgetPlotWind2->graph(1)->setName("Head");
 
 
-  // Det default index for Wind 2 to 'B'
-  ui->comboBoxWind2IDSelect->setCurrentIndex(1);
+  // Set default index for winds to match protocol writing from BTC
+  ui->comboBoxWind2IDSelect->setCurrentIndex(0);
+  ui->comboBoxWind1IDSelect->setCurrentIndex(1);
 
 
   /*
@@ -149,7 +153,6 @@ void MainWindow::readyRead()
       {
         memset(crossSpeed, 0, 8);
         memset(headSpeed, 0, 8);
-
         memcpy(&sensorID, &tmpStr[1],1);
         memcpy(crossSpeed, &tmpStr[3],7);
         memcpy(headSpeed, &tmpStr[11],7);
@@ -173,6 +176,9 @@ void MainWindow::readyRead()
         case 2: WindID2 = 'C';break;
         }
 
+        ui->lcdNumberMessageJitter->display( (int)m_pElapsedTimer->elapsed());
+        m_pElapsedTimer->restart();
+
 
 
         if (m_bUpdateValues)
@@ -181,8 +187,16 @@ void MainWindow::readyRead()
           {
             if (!m_bLockLCD)
             {
+              float cs = QString(crossSpeed).toFloat();
+              float hs = -QString(headSpeed).toFloat();
+
+              ui->lcdNumberHeadWind1->display(QString::number(cs,'f',1));
+              ui->lcdNumberCrossWind1->display(QString::number(hs,'f',1));
+/*
               ui->lcdNumberHeadWind1->display(QString(crossSpeed).toFloat());
               ui->lcdNumberCrossWind1->display(-QString(headSpeed).toFloat());
+
+*/
             }
 
             QString ID(sensorID);
@@ -207,8 +221,15 @@ void MainWindow::readyRead()
           {
             if (!m_bLockLCD)
             {
+              float cs = QString(crossSpeed).toFloat();
+              float hs = -QString(headSpeed).toFloat();
+
+              ui->lcdNumberHeadWind2->display(QString::number(cs,'f',1));
+              ui->lcdNumberCrossWind2->display(QString::number(hs,'f',1));
+/*
               ui->lcdNumberHeadWind2->display(QString(crossSpeed).toFloat());
               ui->lcdNumberCrossWind2->display(-QString(headSpeed).toFloat());
+*/
             }
 
             QString ID(sensorID);

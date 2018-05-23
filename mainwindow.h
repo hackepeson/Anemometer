@@ -6,6 +6,7 @@
 #include <QActionGroup>
 #include "dialogsettings.h"
 #include <QTime>
+#include <QElapsedTimer>
 #include "qcustomplot.h"
 
 namespace Ui {
@@ -40,6 +41,8 @@ private:
 
   QCPItemText* m_textLabelPlot2;
   QCPItemLine* m_arrowPlot2;
+
+  QElapsedTimer* m_pElapsedTimer;
 
 
 private slots:
