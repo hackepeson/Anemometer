@@ -43,7 +43,9 @@ private:
   QCPItemLine* m_arrowPlot2;
 
   QElapsedTimer* m_pElapsedTimer;
-
+  bool m_updateTimeValue;
+  float m_pElapsedTimerValueD1;
+  float m_pElapsedTimerValue;
 
 private slots:
   void readyRead();
@@ -57,7 +59,7 @@ private slots:
   void addT0Marker();
   void removeT0Marker();
   void exportToPDF();
-
+  void resetCommunication();
 };
 
 #endif // MAINWINDOW_H

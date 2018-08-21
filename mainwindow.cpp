@@ -125,20 +125,22 @@ void MainWindow::readyRead()
   char status[2];
   char unit[1];
 
-
-
+  //while (m_SerialPort.canReadLine())
   if (m_SerialPort.canReadLine())
   {
-
     QDateTime timeDT(QDateTime::currentDateTimeUtc());
-
-
     float t = (float)timeDT.time().msecsSinceStartOfDay()/1000;
-
 
     int lineLength = m_SerialPort.readLine(data,1024);
     data[lineLength] = '\0';
     qDebug() << lineLength << " " << data;
+    if (lineLength != 29)
+    {
+        m_SerialPort.readAll();
+        QCoreApplication::processEvents();
+        qDebug() << "Line length mismatch";
+        return;
+    }
 
     // Search for STX in the string
     char* pch;
@@ -176,9 +178,17 @@ void MainWindow::readyRead()
         case 2: WindID2 = 'C';break;
         }
 
-        ui->lcdNumberMessageJitter->display( (int)m_pElapsedTimer->elapsed());
-        m_pElapsedTimer->restart();
-
+//        m_pElapsedTimerValueD1 = (float)m_pElapsedTimerValue;
+//        m_pElapsedTimerValue = (float)m_pElapsedTimer->elapsed();
+//        m_pElapsedTimer->restart();
+//
+//        ui->lcdNumberMessageJitter->display( (int)m_pElapsedTimerValue);
+//        m_updateTimeValue = !m_updateTimeValue;
+//        qDebug() << m_updateTimeValue;
+//        if (m_updateTimeValue)
+//        {
+//          ui->progressBarPhaseCom->setValue(100.0*m_pElapsedTimerValue/(m_pElapsedTimerValue+m_pElapsedTimerValueD1));
+//        }
 
 
         if (m_bUpdateValues)
@@ -261,10 +271,9 @@ void MainWindow::readyRead()
       else
       {
         m_SerialPort.readAll();
-
+        qDebug() << "Error read";
       }
     }
-
   }
 }
 
@@ -541,4 +550,14 @@ void MainWindow::exportToPDF()
 
   }
 
+}
+
+
+void MainWindow::resetCommunication()
+{
+
+    disConnectComPort();
+    QCoreApplication::processEvents();
+    comPortOpen(true);
+    QCoreApplication::processEvents();
 }
