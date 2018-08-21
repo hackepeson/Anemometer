@@ -23,8 +23,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
   m_bUpdateValues = true;
   m_bLockLCD = false;
-  m_dPlotTimeSec = m_ds.getPlotTime();
-  m_dYScale = 0;
+  m_dPlotTimeSec = 60;//m_ds.getPlotTime();
+  m_dYScale = 6;
   m_bDebugOutput = false;
 
   m_pElapsedTimer = new QElapsedTimer();
@@ -74,8 +74,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
   // Set default index for winds to match protocol writing from BTC
-  ui->comboBoxWind2IDSelect->setCurrentIndex(0);
-  ui->comboBoxWind1IDSelect->setCurrentIndex(1);
+  ui->comboBoxWind2IDSelect->setCurrentIndex(1);
+  ui->comboBoxWind1IDSelect->setCurrentIndex(0);
 
 
   /*
@@ -125,8 +125,8 @@ void MainWindow::readyRead()
   char status[2];
   char unit[1];
 
-  //while (m_SerialPort.canReadLine())
-  if (m_SerialPort.canReadLine())
+  while (m_SerialPort.canReadLine())
+  //if (m_SerialPort.canReadLine())
   {
     QDateTime timeDT(QDateTime::currentDateTimeUtc());
     float t = (float)timeDT.time().msecsSinceStartOfDay()/1000;
@@ -178,13 +178,25 @@ void MainWindow::readyRead()
         case 2: WindID2 = 'C';break;
         }
 
-//        m_pElapsedTimerValueD1 = (float)m_pElapsedTimerValue;
-//        m_pElapsedTimerValue = (float)m_pElapsedTimer->elapsed();
-//        m_pElapsedTimer->restart();
-//
-//        ui->lcdNumberMessageJitter->display( (int)m_pElapsedTimerValue);
-//        m_updateTimeValue = !m_updateTimeValue;
-//        qDebug() << m_updateTimeValue;
+        m_pElapsedTimerValueD1 = (float)m_pElapsedTimerValue;
+        m_pElapsedTimerValue = (float)m_pElapsedTimer->elapsed();
+        m_pElapsedTimer->restart();
+
+
+        if (m_updateTimeValue)
+        {
+            m_updateTimeValue = false;
+        }
+        else
+        {
+            m_updateTimeValue = true;
+        }
+        qDebug() << m_updateTimeValue;
+        if (m_updateTimeValue)
+        {
+            ui->lcdNumberMessageJitter->display( (int)m_pElapsedTimerValue);
+        }
+
 //        if (m_updateTimeValue)
 //        {
 //          ui->progressBarPhaseCom->setValue(100.0*m_pElapsedTimerValue/(m_pElapsedTimerValue+m_pElapsedTimerValueD1));
