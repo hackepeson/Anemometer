@@ -68,21 +68,45 @@
              <item row="2" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_3">
                <item>
-                <widget class="QLabel" name="label_2">
-                 <property name="autoFillBackground">
-                  <bool>false</bool>
+                <layout class="QVBoxLayout" name="verticalLayout_5">
+                 <property name="spacing">
+                  <number>0</number>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">color: rgb(255, 0, 0);
+                 <item>
+                  <widget class="QLabel" name="label_2">
+                   <property name="autoFillBackground">
+                    <bool>false</bool>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">color: rgb(255, 0, 0);
 font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
-                 </property>
-                 <property name="text">
-                  <string>Cross</string>
-                 </property>
-                 <property name="scaledContents">
-                  <bool>false</bool>
-                 </property>
-                </widget>
+                   </property>
+                   <property name="text">
+                    <string>Lateral</string>
+                   </property>
+                   <property name="scaledContents">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_8">
+                   <property name="autoFillBackground">
+                    <bool>false</bool>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">color: rgb(255, 0, 0);
+font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
+                   </property>
+                   <property name="text">
+                    <string>(Cross)</string>
+                   </property>
+                   <property name="scaledContents">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
                <item>
                 <widget class="QLCDNumber" name="lcdNumberCrossWind1">
@@ -573,15 +597,33 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
              <item row="1" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_4">
                <item>
-                <widget class="QLabel" name="label">
-                 <property name="styleSheet">
-                  <string notr="true">color: rgb(0, 0, 255);
+                <layout class="QVBoxLayout" name="verticalLayout_8">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="label_11">
+                   <property name="styleSheet">
+                    <string notr="true">color: rgb(0, 0, 255);
 font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
-                 </property>
-                 <property name="text">
-                  <string>Head</string>
-                 </property>
-                </widget>
+                   </property>
+                   <property name="text">
+                    <string>Force</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_12">
+                   <property name="styleSheet">
+                    <string notr="true">color: rgb(0, 0, 255);
+font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
+                   </property>
+                   <property name="text">
+                    <string>(Head)</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
                <item>
                 <widget class="QLCDNumber" name="lcdNumberHeadWind1">
@@ -1078,15 +1120,45 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
              <item row="2" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_2">
                <item>
-                <widget class="QLabel" name="label_4">
-                 <property name="styleSheet">
-                  <string notr="true">color: rgb(255, 0, 0);
+                <layout class="QVBoxLayout" name="verticalLayout_9">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="label_13">
+                   <property name="autoFillBackground">
+                    <bool>false</bool>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">color: rgb(255, 0, 0);
 font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
-                 </property>
-                 <property name="text">
-                  <string>Cross</string>
-                 </property>
-                </widget>
+                   </property>
+                   <property name="text">
+                    <string>Lateral</string>
+                   </property>
+                   <property name="scaledContents">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_14">
+                   <property name="autoFillBackground">
+                    <bool>false</bool>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">color: rgb(255, 0, 0);
+font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
+                   </property>
+                   <property name="text">
+                    <string>(Cross)</string>
+                   </property>
+                   <property name="scaledContents">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
                <item>
                 <widget class="QLCDNumber" name="lcdNumberCrossWind2">
@@ -1524,15 +1596,33 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
              <item row="1" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout">
                <item>
-                <widget class="QLabel" name="label_3">
-                 <property name="styleSheet">
-                  <string notr="true">color: rgb(0, 0, 255);
+                <layout class="QVBoxLayout" name="verticalLayout_4">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="label_7">
+                   <property name="styleSheet">
+                    <string notr="true">color: rgb(0, 0, 255);
 font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
-                 </property>
-                 <property name="text">
-                  <string>Head</string>
-                 </property>
-                </widget>
+                   </property>
+                   <property name="text">
+                    <string>Force</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label">
+                   <property name="styleSheet">
+                    <string notr="true">color: rgb(0, 0, 255);
+font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
+                   </property>
+                   <property name="text">
+                    <string>(Head)</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
                <item>
                 <widget class="QLCDNumber" name="lcdNumberHeadWind2">

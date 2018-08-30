@@ -105,6 +105,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->widgetPlotWind1->legend->setVisible(false);
     ui->widgetPlotWind2->legend->setVisible(false);
   }
+
+  ui->widgetPlotWind1->setColor(Qt::red);
   ui->widgetPlotWind1->replot();
   ui->widgetPlotWind2->replot();
 
@@ -212,6 +214,19 @@ void MainWindow::readyRead()
               float cs = QString(crossSpeed).toFloat();
               float hs = -QString(headSpeed).toFloat();
 
+              float windSpeedTotal = sqrt(cs*cs+hs*hs);
+
+              if (windSpeedTotal < 5)
+              {
+                ui->widgetPlotWind1->setColor(Qt::red);
+              }
+              else
+              {
+                  ui->widgetPlotWind1->setColor(Qt::white);
+              }
+
+
+
               ui->lcdNumberHeadWind1->display(QString::number(cs,'f',1));
               ui->lcdNumberCrossWind1->display(QString::number(hs,'f',1));
 /*
@@ -245,6 +260,17 @@ void MainWindow::readyRead()
             {
               float cs = QString(crossSpeed).toFloat();
               float hs = -QString(headSpeed).toFloat();
+
+              float windSpeedTotal = sqrt(cs*cs+hs*hs);
+
+              if (windSpeedTotal < 5)
+              {
+                ui->widgetPlotWind2->setColor(Qt::red);
+              }
+              else
+              {
+                  ui->widgetPlotWind2->setColor(Qt::white);
+              }
 
               ui->lcdNumberHeadWind2->display(QString::number(cs,'f',1));
               ui->lcdNumberCrossWind2->display(QString::number(hs,'f',1));
