@@ -127,7 +127,7 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->widgetPlotWind2->legend->setVisible(false);
     }
 
-    ui->widgetPlotWind1->setColor(Qt::red);
+    //ui->widgetPlotWind1->setColor(Qt::red);
     ui->widgetPlotWind1->replot();
     ui->widgetPlotWind2->replot();
 
@@ -237,9 +237,9 @@ void MainWindow::readyRead()
 
                             float windSpeedTotal = sqrt(cs*cs+hs*hs);
 
-                            if (windSpeedTotal < 5)
+                            if (windSpeedTotal > 5)
                             {
-                                ui->widgetPlotWind1->setColor(Qt::red);
+                                ui->widgetPlotWind1->setColor(Qt::yellow);
                             }
                             else
                             {
@@ -284,9 +284,9 @@ void MainWindow::readyRead()
 
                             float windSpeedTotal = sqrt(cs*cs+hs*hs);
 
-                            if (windSpeedTotal < 5)
+                            if (windSpeedTotal > 5)
                             {
-                                ui->widgetPlotWind2->setColor(Qt::red);
+                                ui->widgetPlotWind2->setColor(Qt::yellow);
                             }
                             else
                             {
