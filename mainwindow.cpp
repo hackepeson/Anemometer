@@ -52,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
   m_pElapsedTimer->start();
 
   m_pPollTimer = new QTimer();
-  m_pPollTimer->setInterval(125);
+  m_pPollTimer->setInterval(250);
   m_pPollTimer->start();
   m_bPollMessage = false;
 
@@ -157,6 +157,14 @@ void MainWindow::readyRead()
   char sensorID;
   char status[2];
   char unit[1];
+
+  /*
+  if (m_SerialPort.canReadLine())
+  {
+      qDebug() << m_SerialPort.readLine();
+  }
+  return;
+  */
 
   while (m_SerialPort.canReadLine())
     //if (m_SerialPort.canReadLine())
@@ -650,9 +658,6 @@ void MainWindow::pollForMessage()
         case 1: mess.append('B');break;
         case 2: mess.append('C');break;
         }
-
-
-
       }
       else
       {
@@ -664,8 +669,9 @@ void MainWindow::pollForMessage()
         }
 
       }
-      mess.append('\r');
-      qDebug() << mess.data();
+      //mess.append('\r');
+      qDebug() << "Sending " << mess.data();
+      m_SerialPort.write(mess);
 
     }
   }

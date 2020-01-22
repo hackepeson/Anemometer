@@ -261,16 +261,7 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    <colorrole role="PlaceholderText">
-                     <brush brushstyle="NoBrush">
-                      <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
-                      </color>
-                     </brush>
-                    </colorrole>
-                   </active>
+                    </active>
                    <inactive>
                     <colorrole role="WindowText">
                      <brush brushstyle="SolidPattern">
@@ -407,15 +398,7 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    <colorrole role="PlaceholderText">
-                     <brush brushstyle="NoBrush">
-                      <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
-                      </color>
-                     </brush>
-                    </colorrole>
+                    
                    </inactive>
                    <disabled>
                     <colorrole role="WindowText">
@@ -553,15 +536,7 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    <colorrole role="PlaceholderText">
-                     <brush brushstyle="NoBrush">
-                      <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
-                      </color>
-                     </brush>
-                    </colorrole>
+                   
                    </disabled>
                   </palette>
                  </property>
@@ -805,15 +780,7 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    <colorrole role="PlaceholderText">
-                     <brush brushstyle="NoBrush">
-                      <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
-                      </color>
-                     </brush>
-                    </colorrole>
+                    
                    </active>
                    <inactive>
                     <colorrole role="WindowText">
@@ -951,15 +918,7 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    <colorrole role="PlaceholderText">
-                     <brush brushstyle="NoBrush">
-                      <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
-                      </color>
-                     </brush>
-                    </colorrole>
+                   
                    </inactive>
                    <disabled>
                     <colorrole role="WindowText">
@@ -1097,15 +1056,7 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    <colorrole role="PlaceholderText">
-                     <brush brushstyle="NoBrush">
-                      <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
-                      </color>
-                     </brush>
-                    </colorrole>
+                    
                    </disabled>
                   </palette>
                  </property>
@@ -1367,15 +1318,7 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    <colorrole role="PlaceholderText">
-                     <brush brushstyle="NoBrush">
-                      <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
-                      </color>
-                     </brush>
-                    </colorrole>
+                    
                    </active>
                    <inactive>
                     <colorrole role="WindowText">
@@ -1513,15 +1456,7 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    <colorrole role="PlaceholderText">
-                     <brush brushstyle="NoBrush">
-                      <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
-                      </color>
-                     </brush>
-                    </colorrole>
+                    
                    </inactive>
                    <disabled>
                     <colorrole role="WindowText">
@@ -1659,15 +1594,7 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    <colorrole role="PlaceholderText">
-                     <brush brushstyle="NoBrush">
-                      <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
-                      </color>
-                     </brush>
-                    </colorrole>
+                   
                    </disabled>
                   </palette>
                  </property>
@@ -1858,15 +1785,7 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    <colorrole role="PlaceholderText">
-                     <brush brushstyle="NoBrush">
-                      <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
-                      </color>
-                     </brush>
-                    </colorrole>
+                    
                    </active>
                    <inactive>
                     <colorrole role="WindowText">
@@ -2004,15 +1923,7 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    <colorrole role="PlaceholderText">
-                     <brush brushstyle="NoBrush">
-                      <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
-                      </color>
-                     </brush>
-                    </colorrole>
+                    
                    </inactive>
                    <disabled>
                     <colorrole role="WindowText">
@@ -2150,15 +2061,7 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    <colorrole role="PlaceholderText">
-                     <brush brushstyle="NoBrush">
-                      <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
-                      </color>
-                     </brush>
-                    </colorrole>
+                    
                    </disabled>
                   </palette>
                  </property>
