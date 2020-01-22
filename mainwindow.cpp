@@ -151,6 +151,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::readyRead()
 {
+
+
+  newReadyReadImplementation(m_SerialPort);
+  return;
+
   char data[1024];
   char crossSpeed[8];
   char headSpeed[8];
@@ -268,11 +273,6 @@ void MainWindow::readyRead()
 
               ui->lcdNumberHeadWind1->display(QString::number(cs,'f',1));
               ui->lcdNumberCrossWind1->display(QString::number(hs,'f',1));
-              /*
-              ui->lcdNumberHeadWind1->display(QString(crossSpeed).toFloat());
-              ui->lcdNumberCrossWind1->display(-QString(headSpeed).toFloat());
-
-*/
             }
 
             QString ID(sensorID);
@@ -675,4 +675,186 @@ void MainWindow::pollForMessage()
 
     }
   }
+}
+
+void MainWindow::newReadyReadImplementation(QSerialPort& serial)
+{
+  if (serial.canReadLine())
+  {
+
+    QByteArray line = serial.readLine();
+    qDebug() << line << " " << line.length();
+    if ((line.length() == 29) && (line.at(0) == 2))
+    {
+      QDateTime timeDT(QDateTime::currentDateTimeUtc());
+      float t = (float)timeDT.time().msecsSinceStartOfDay()/1000;
+
+      QString crossSpeed;
+      QString headSpeed;
+      QString sensorID;
+      QString status;
+      QString unit;
+
+      //memset(crossSpeed, 0, 8);
+      //memset(headSpeed, 0, 8);
+
+      //memcpy(&sensorID, &tmpStr[1],1);
+      sensorID.append(line.mid(1,1));
+
+      //memcpy(crossSpeed, &tmpStr[3],7);
+      crossSpeed.append(line.mid(3,7));
+
+      //memcpy(headSpeed, &tmpStr[11],7);
+      crossSpeed.append(line.mid(11,7));
+
+      //memcpy(unit, &tmpStr[19],1);
+      unit.append(line.mid(19,1));
+
+      //memcpy(status, &tmpStr[21],2);
+      unit.append(line.mid(21,2));
+
+      char WindID1;
+      char WindID2;
+
+      switch (ui->comboBoxWind1IDSelect->currentIndex())
+      {
+      case 0: WindID1 = 'A';break;
+      case 1: WindID1 = 'B';break;
+      case 2: WindID1 = 'C';break;
+      }
+
+      switch (ui->comboBoxWind2IDSelect->currentIndex())
+      {
+      case 0: WindID2 = 'A';break;
+      case 1: WindID2 = 'B';break;
+      case 2: WindID2 = 'C';break;
+      }
+
+      m_pElapsedTimerValueD1 = (float)m_pElapsedTimerValue;
+      m_pElapsedTimerValue = (float)m_pElapsedTimer->elapsed();
+      m_pElapsedTimer->restart();
+
+
+      if (m_updateTimeValue)
+      {
+        m_updateTimeValue = false;
+      }
+      else
+      {
+        m_updateTimeValue = true;
+      }
+      qDebug() << m_updateTimeValue;
+      if (m_updateTimeValue)
+      {
+        ui->lcdNumberMessageJitter->display( (int)m_pElapsedTimerValue);
+      }
+
+      //        if (m_updateTimeValue)
+      //        {
+      //          ui->progressBarPhaseCom->setValue(100.0*m_pElapsedTimerValue/(m_pElapsedTimerValue+m_pElapsedTimerValueD1));
+      //        }
+
+
+      if (m_bUpdateValues)
+      {
+        if (sensorID == WindID1)
+        {
+          if (!m_bLockLCD)
+          {
+            float cs = QString(crossSpeed).toFloat();
+            float hs = -QString(headSpeed).toFloat();
+
+            float windSpeedTotal = sqrt(cs*cs+hs*hs);
+
+            if (windSpeedTotal > 5)
+            {
+              ui->widgetPlotWind1->setColor(Qt::yellow);
+            }
+            else
+            {
+              ui->widgetPlotWind1->setColor(Qt::white);
+            }
+
+
+
+            ui->lcdNumberHeadWind1->display(QString::number(cs,'f',1));
+            ui->lcdNumberCrossWind1->display(QString::number(hs,'f',1));
+          }
+
+          QString ID(sensorID);
+          ui->widgetPlotWind1->graph(0)->removeDataBefore(t-m_dPlotTimeSec);
+          ui->widgetPlotWind1->graph(1)->removeDataBefore(t-m_dPlotTimeSec);
+          ui->labelSensorWind1->setText(ID);
+          ui->widgetPlotWind1->graph(0)->addData((float)t, -headSpeed.toFloat());
+          ui->widgetPlotWind1->graph(1)->addData((float)t, crossSpeed.toFloat());
+          if (m_dYScale == 0)
+          {
+            ui->widgetPlotWind1->rescaleAxes();
+          }
+          else
+          {
+            ui->widgetPlotWind1->yAxis->setRange(-m_dYScale,m_dYScale);
+          }
+          ui->widgetPlotWind1->xAxis->setRange((float)t,m_dPlotTimeSec, Qt::AlignRight);
+          ui->widgetPlotWind1->setTitle(ID);
+          ui->widgetPlotWind1->replot();
+        }
+        if (sensorID == WindID2)
+        {
+          if (!m_bLockLCD)
+          {
+            float cs = crossSpeed.toFloat();
+            float hs = -headSpeed.toFloat();
+
+            float windSpeedTotal = sqrt(cs*cs+hs*hs);
+
+            if (windSpeedTotal > 5)
+            {
+              ui->widgetPlotWind2->setColor(Qt::yellow);
+            }
+            else
+            {
+              ui->widgetPlotWind2->setColor(Qt::white);
+            }
+
+            ui->lcdNumberHeadWind2->display(QString::number(cs,'f',1));
+            ui->lcdNumberCrossWind2->display(QString::number(hs,'f',1));
+            /*
+              ui->lcdNumberHeadWind2->display(QString(crossSpeed).toFloat());
+              ui->lcdNumberCrossWind2->display(-QString(headSpeed).toFloat());
+*/
+          }
+
+          QString ID(sensorID);
+          ui->widgetPlotWind2->graph(0)->removeDataBefore(t-m_dPlotTimeSec);
+          ui->widgetPlotWind2->graph(1)->removeDataBefore(t-m_dPlotTimeSec);
+          ui->labelSensorWind2->setText(ID);
+          ui->widgetPlotWind2->graph(0)->addData((float)t, -headSpeed.toFloat());
+          ui->widgetPlotWind2->graph(1)->addData((float)t, crossSpeed.toFloat());
+
+          if (m_dYScale == 0)
+          {
+            ui->widgetPlotWind2->rescaleAxes();
+          }
+          else
+          {
+            ui->widgetPlotWind2->yAxis->setRange(-m_dYScale,m_dYScale);
+          }
+          ui->widgetPlotWind2->xAxis->setRange((float)t,m_dPlotTimeSec, Qt::AlignRight);
+          ui->widgetPlotWind2->setTitle(ID);
+          ui->widgetPlotWind2->replot();
+        }
+      }
+      if (m_bDebugOutput)
+      {
+        QString text = QString(line).simplified();
+        ui->textEditSerialInput->append(text);
+      }
+
+
+    }
+
+
+  }
+
 }
