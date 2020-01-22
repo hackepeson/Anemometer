@@ -6,6 +6,7 @@
 #include <QActionGroup>
 #include "dialogsettings.h"
 #include <QTime>
+#include <QElapsedTimer>
 #include "qcustomplot.h"
 
 namespace Ui {
@@ -41,7 +42,11 @@ private:
   QCPItemText* m_textLabelPlot2;
   QCPItemLine* m_arrowPlot2;
 
-  char m_serialData[1024];
+  QElapsedTimer* m_pElapsedTimer;
+  bool m_updateTimeValue;
+  float m_pElapsedTimerValueD1;
+  float m_pElapsedTimerValue;
+
 private slots:
   void readyRead();
   void updateComportList();
@@ -54,8 +59,7 @@ private slots:
   void addT0Marker();
   void removeT0Marker();
   void exportToPDF();
-  void reset();
-
+  void resetCommunication();
 };
 
 #endif // MAINWINDOW_H

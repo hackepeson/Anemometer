@@ -1,0 +1,5 @@
+Checka vindriktinig 
+  Cross verkar vara head enligt vårat koordinatsystem
+  Checka även tecken +/- om det ändras då det också verkar skilja
+  
+  

@@ -10,7 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 #CONFIG += static
 
-TARGET = Anemometer
+TARGET = Anemometer_new
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -43,3 +43,6 @@ HEADERS += \
 FORMS += \
         mainwindow.ui \
     dialogsettings.ui
+
+RESOURCES += \
+    resource.qrc
