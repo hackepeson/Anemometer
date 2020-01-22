@@ -31,6 +31,7 @@ private:
   DialogSettings m_ds;
   int m_dPlotTimeSec;
   int m_dYScale;
+  bool m_bPollMessage;
 
   bool m_bDebugOutput;
 
@@ -47,6 +48,8 @@ private:
   float m_pElapsedTimerValueD1;
   float m_pElapsedTimerValue;
 
+  QTimer* m_pPollTimer;
+
 private slots:
   void readyRead();
   void updateComportList();
@@ -60,6 +63,8 @@ private slots:
   void removeT0Marker();
   void exportToPDF();
   void resetCommunication();
+  void pollForMessage();
+
 };
 
 #endif // MAINWINDOW_H
