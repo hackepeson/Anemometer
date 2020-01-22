@@ -18,6 +18,13 @@
     <item row="0" column="0">
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
+       <widget class="QPushButton" name="pushButtonReset">
+        <property name="text">
+         <string>Reset</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_7">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -68,6 +75,19 @@
                 </widget>
                </item>
               </layout>
+             </item>
+             <item row="4" column="0">
+              <spacer name="verticalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
              </item>
              <item row="2" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -515,20 +535,7 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                </item>
               </layout>
              </item>
-             <item row="4" column="0">
-              <spacer name="verticalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="5" column="0">
+             <item row="6" column="0">
               <widget class="QComboBox" name="comboBoxWind1IDSelect">
                <item>
                 <property name="text">
@@ -2063,6 +2070,11 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
   <action name="actionPDF">
    <property name="text">
     <string>PDF</string>
+   </property>
+  </action>
+  <action name="actionReset">
+   <property name="text">
+    <string>Reset</string>
    </property>
   </action>
  </widget>

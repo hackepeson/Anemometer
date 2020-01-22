@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
   connect(ui->actionPDF, SIGNAL(triggered(bool)), SLOT(exportToPDF()));
 
+  connect(ui->pushButtonReset, SIGNAL(clicked(bool)), SLOT(reset()));
   m_pComPortActionGroup = new QActionGroup(this);
   updateComportList();
 
@@ -114,16 +115,142 @@ MainWindow::~MainWindow()
 
 void MainWindow::readyRead()
 {
-  char data[1024];
+  //char data[1024];
   char crossSpeed[8];
   char headSpeed[8];
   char sensorID;
   char status[2];
   char unit[1];
 
+  char data;
+  char szDataString[64];
+  static int index = 0;
+
+  while (m_SerialPort.bytesAvailable() > 0)
+  {
+      m_SerialPort.read(&data,1);
+      //qDebug() << index;
+      if (data == 2)
+      {
+          index = 0;
+           szDataString[index++] = 2;
+
+      }
+      else if (index == 23)
+      {
+          szDataString[index++] = '\r';
+          szDataString[index++] = '\n';
+          szDataString[index++] = '\0';
+
+          QDateTime timeDT(QDateTime::currentDateTimeUtc());
+          float t = (float)timeDT.time().msecsSinceStartOfDay()/1000;
+
+          memset(crossSpeed, 0, 8);
+          memset(headSpeed, 0, 8);
+
+          //char tmpStr[128];
+
+          memcpy(&sensorID, &szDataString[1],1);
+          memcpy(crossSpeed, &szDataString[3],7);
+          memcpy(headSpeed, &szDataString[11],7);
 
 
-  if (m_SerialPort.canReadLine())
+          char WindID1;
+          char WindID2;
+
+          switch (ui->comboBoxWind1IDSelect->currentIndex())
+          {
+          case 0: WindID1 = 'A';break;
+          case 1: WindID1 = 'B';break;
+          case 2: WindID1 = 'C';break;
+          }
+
+          switch (ui->comboBoxWind2IDSelect->currentIndex())
+          {
+          case 0: WindID2 = 'A';break;
+          case 1: WindID2 = 'B';break;
+          case 2: WindID2 = 'C';break;
+          }
+
+          qDebug() << crossSpeed;
+          qDebug() << headSpeed;
+
+          if (m_bUpdateValues)
+          {
+            if (sensorID == WindID1)
+            {
+              if (!m_bLockLCD)
+              {
+                ui->lcdNumberHeadWind1->display(QString(crossSpeed).toFloat());
+                ui->lcdNumberCrossWind1->display(-QString(headSpeed).toFloat());
+              }
+
+              QString ID(sensorID);
+              ui->widgetPlotWind1->graph(0)->removeDataBefore(t-m_dPlotTimeSec);
+              ui->widgetPlotWind1->graph(1)->removeDataBefore(t-m_dPlotTimeSec);
+              ui->labelSensorWind1->setText(ID);
+              ui->widgetPlotWind1->graph(0)->addData((float)t, -QString(headSpeed).toFloat());
+              ui->widgetPlotWind1->graph(1)->addData((float)t, QString(crossSpeed).toFloat());
+              if (m_dYScale == 0)
+              {
+                ui->widgetPlotWind1->rescaleAxes();
+              }
+              else
+              {
+                ui->widgetPlotWind1->yAxis->setRange(-m_dYScale,m_dYScale);
+              }
+              ui->widgetPlotWind1->xAxis->setRange((float)t,m_dPlotTimeSec, Qt::AlignRight);
+              ui->widgetPlotWind1->setTitle(ID);
+              ui->widgetPlotWind1->replot();
+            }
+            if (sensorID == WindID2)
+            {
+              if (!m_bLockLCD)
+              {
+                ui->lcdNumberHeadWind2->display(QString(crossSpeed).toFloat());
+                ui->lcdNumberCrossWind2->display(-QString(headSpeed).toFloat());
+              }
+
+              QString ID(sensorID);
+              ui->widgetPlotWind2->graph(0)->removeDataBefore(t-m_dPlotTimeSec);
+              ui->widgetPlotWind2->graph(1)->removeDataBefore(t-m_dPlotTimeSec);
+              ui->labelSensorWind2->setText(ID);
+              ui->widgetPlotWind2->graph(0)->addData((float)t, -QString(headSpeed).toFloat());
+              ui->widgetPlotWind2->graph(1)->addData((float)t, QString(crossSpeed).toFloat());
+
+              if (m_dYScale == 0)
+              {
+                ui->widgetPlotWind2->rescaleAxes();
+              }
+              else
+              {
+                ui->widgetPlotWind2->yAxis->setRange(-m_dYScale,m_dYScale);
+              }
+              ui->widgetPlotWind2->xAxis->setRange((float)t,m_dPlotTimeSec, Qt::AlignRight);
+              ui->widgetPlotWind2->setTitle(ID);
+              ui->widgetPlotWind2->replot();
+            }
+          }
+          if (m_bDebugOutput)
+          {
+            QString text = QString(m_serialData).simplified();
+            ui->textEditSerialInput->append(text);
+          }
+
+
+      }
+      else
+      {
+          szDataString[index++] = data;
+      }
+
+  }
+  return;
+
+
+  //if (m_SerialPort.canReadLine())
+  if (m_SerialPort.bytesAvailable() > 100)
+
   {
 
     QDateTime timeDT(QDateTime::currentDateTimeUtc());
@@ -132,18 +259,20 @@ void MainWindow::readyRead()
     float t = (float)timeDT.time().msecsSinceStartOfDay()/1000;
 
 
-    int lineLength = m_SerialPort.readLine(data,1024);
-    data[lineLength] = '\0';
-    qDebug() << lineLength << " " << data;
+    //int lineLength = m_SerialPort.readLine(m_serialData,1024);
+    int lineLength = m_SerialPort.read(m_serialData,m_SerialPort.bytesAvailable());
+
+    m_serialData[lineLength] = '\0';
+    qDebug() << lineLength << " " << m_serialData;
 
     // Search for STX in the string
     char* pch;
-    pch = strchr(data,'\2');
+    pch = strchr(m_serialData,'\2');
 
     while (pch != NULL)
     {
       char tmpStr[128];
-      memcpy(tmpStr, &data[pch-data], 28);
+      memcpy(tmpStr, &m_serialData[pch-m_serialData], 28);
       pch=strchr(pch+1,'\2');
       if (tmpStr[0] == '\2')
       {
@@ -233,7 +362,7 @@ void MainWindow::readyRead()
         }
         if (m_bDebugOutput)
         {
-          QString text = QString(data).simplified();
+          QString text = QString(m_serialData).simplified();
           ui->textEditSerialInput->append(text);
         }
       }
@@ -520,4 +649,11 @@ void MainWindow::exportToPDF()
 
   }
 
+}
+
+
+void MainWindow::reset()
+{
+    memset(m_serialData, 0,1024);
+    qDebug() << "reset";
 }
