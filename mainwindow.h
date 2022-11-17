@@ -51,6 +51,7 @@ private:
   QTimer* m_pPollTimer;
 
   void newReadyReadImplementation(QSerialPort &serial);
+  void CharReadyRead(QSerialPort &serial);
 
 private slots:
   void readyRead();

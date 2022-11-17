@@ -151,10 +151,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::readyRead()
 {
+    CharReadyRead(m_SerialPort);
+    return;
 
-
-  newReadyReadImplementation(m_SerialPort);
-  return;
+  //newReadyReadImplementation(m_SerialPort);
+  //return;
 
   char data[1024];
   char crossSpeed[8];
@@ -179,14 +180,22 @@ void MainWindow::readyRead()
 
     int lineLength = m_SerialPort.readLine(data,1024);
     data[lineLength] = '\0';
-    qDebug() << lineLength << " " << data;
+    //qDebug() << lineLength << " " << data;
+
     if (lineLength != 29)
     {
       m_SerialPort.readAll();
       QCoreApplication::processEvents();
       qDebug() << "Line length mismatch";
+      m_SerialPort.close();
+      QCoreApplication::processEvents();
+      m_SerialPort.open(QIODevice::ReadWrite);
+      QCoreApplication::processEvents();
+      m_SerialPort.flush();
+
       return;
     }
+
 
     // Search for STX in the string
     char* pch;
@@ -237,7 +246,7 @@ void MainWindow::readyRead()
         {
           m_updateTimeValue = true;
         }
-        qDebug() << m_updateTimeValue;
+        //qDebug() << m_updateTimeValue;
         if (m_updateTimeValue)
         {
           ui->lcdNumberMessageJitter->display( (int)m_pElapsedTimerValue);
@@ -352,6 +361,7 @@ void MainWindow::readyRead()
       }
     }
   }
+
 }
 
 void MainWindow::updateComportList()
@@ -411,6 +421,7 @@ void MainWindow::comPortOpen(bool ctrl)
       m_SerialPort.setDataBits(QSerialPort::Data8);
       m_SerialPort.setStopBits(QSerialPort::OneStop);
       m_SerialPort.setParity(QSerialPort::NoParity);
+      m_SerialPort.setReadBufferSize(64);
 
       ui->statusBar->showMessage("Comport " + sender()->objectName() + " opened", 3000);
       setWindowTitle("Anemometer (" + sender()->objectName() + ")");
@@ -670,16 +681,233 @@ void MainWindow::pollForMessage()
 
       }
       //mess.append('\r');
-      qDebug() << "Sending " << mess.data();
+      //qDebug() << "Sending " << mess.data();
+      //m_SerialPort.readAll();
+      //m_SerialPort.flush();
       m_SerialPort.write(mess);
 
     }
   }
 }
 
+void MainWindow::CharReadyRead(QSerialPort &serial)
+{
+    char data;
+    static bool foundCompleteString = false;
+    static bool foundSTX = false;
+    static bool foundETX = false;
+    static QString windString;
+
+
+    while (serial.bytesAvailable())
+    {
+      serial.read(&data,1);
+      if (data == 3)
+      {
+          qDebug() << windString.length();
+      }
+      qDebug() << data;
+      if (data == 2)
+      {
+          foundSTX = true;
+          windString.clear();
+          foundETX = false;
+          foundCompleteString = false;
+      }
+      else if (data == 3 && (windString.length() == 22))
+      {
+          QString crossSpeed;
+          QString headSpeed;
+          QString sensorID;
+
+          foundCompleteString = true;
+          foundSTX = false;
+          foundETX = true;
+          foundCompleteString = true;
+
+          qDebug() << windString;
+
+          sensorID.append(windString.mid(0,1));
+          //qDebug() << sensorID;
+
+
+          crossSpeed.append(windString.mid(3,7));
+          //qDebug() << crossSpeed;
+
+          headSpeed.append(windString.mid(11,7));
+          //qDebug() << headSpeed;
+
+          qDebug() << sensorID << " " << crossSpeed << " " << headSpeed;
+
+          QDateTime timeDT(QDateTime::currentDateTimeUtc());
+          float t = (float)timeDT.time().msecsSinceStartOfDay()/1000;
+
+          char WindID1;
+          char WindID2;
+
+          switch (ui->comboBoxWind1IDSelect->currentIndex())
+          {
+          case 0: WindID1 = 'A';break;
+          case 1: WindID1 = 'B';break;
+          case 2: WindID1 = 'C';break;
+          }
+
+          switch (ui->comboBoxWind2IDSelect->currentIndex())
+          {
+          case 0: WindID2 = 'A';break;
+          case 1: WindID2 = 'B';break;
+          case 2: WindID2 = 'C';break;
+          }
+
+          m_pElapsedTimerValueD1 = (float)m_pElapsedTimerValue;
+          m_pElapsedTimerValue = (float)m_pElapsedTimer->elapsed();
+          m_pElapsedTimer->restart();
+
+
+          if (m_updateTimeValue)
+          {
+            m_updateTimeValue = false;
+          }
+          else
+          {
+            m_updateTimeValue = true;
+          }
+          //qDebug() << m_updateTimeValue;
+          if (m_updateTimeValue)
+          {
+            ui->lcdNumberMessageJitter->display( (int)m_pElapsedTimerValue);
+          }
+
+          //        if (m_updateTimeValue)
+          //        {
+          //          ui->progressBarPhaseCom->setValue(100.0*m_pElapsedTimerValue/(m_pElapsedTimerValue+m_pElapsedTimerValueD1));
+          //        }
+
+
+          if (m_bUpdateValues)
+          {
+            if (sensorID == WindID1)
+            {
+              if (!m_bLockLCD)
+              {
+                float cs = QString(crossSpeed).toFloat();
+                float hs = -QString(headSpeed).toFloat();
+
+                float windSpeedTotal = sqrt(cs*cs+hs*hs);
+
+                if (windSpeedTotal > 5)
+                {
+                  ui->widgetPlotWind1->setColor(Qt::yellow);
+                }
+                else
+                {
+                  ui->widgetPlotWind1->setColor(Qt::white);
+                }
+
+
+
+                ui->lcdNumberHeadWind1->display(QString::number(cs,'f',1));
+                ui->lcdNumberCrossWind1->display(QString::number(hs,'f',1));
+              }
+
+              QString ID(sensorID);
+              ui->widgetPlotWind1->graph(0)->removeDataBefore(t-m_dPlotTimeSec);
+              ui->widgetPlotWind1->graph(1)->removeDataBefore(t-m_dPlotTimeSec);
+              ui->labelSensorWind1->setText(ID);
+              ui->widgetPlotWind1->graph(0)->addData((float)t, -headSpeed.toFloat());
+              ui->widgetPlotWind1->graph(1)->addData((float)t, crossSpeed.toFloat());
+              if (m_dYScale == 0)
+              {
+                ui->widgetPlotWind1->rescaleAxes();
+              }
+              else
+              {
+                ui->widgetPlotWind1->yAxis->setRange(-m_dYScale,m_dYScale);
+              }
+              ui->widgetPlotWind1->xAxis->setRange((float)t,m_dPlotTimeSec, Qt::AlignRight);
+              ui->widgetPlotWind1->setTitle(ID);
+              ui->widgetPlotWind1->replot();
+            }
+            if (sensorID == WindID2)
+            {
+              if (!m_bLockLCD)
+              {
+                float cs = crossSpeed.toFloat();
+                float hs = -headSpeed.toFloat();
+
+                float windSpeedTotal = sqrt(cs*cs+hs*hs);
+
+                if (windSpeedTotal > 5)
+                {
+                  ui->widgetPlotWind2->setColor(Qt::yellow);
+                }
+                else
+                {
+                  ui->widgetPlotWind2->setColor(Qt::white);
+                }
+
+                ui->lcdNumberHeadWind2->display(QString::number(cs,'f',1));
+                ui->lcdNumberCrossWind2->display(QString::number(hs,'f',1));
+                /*
+                  ui->lcdNumberHeadWind2->display(QString(crossSpeed).toFloat());
+                  ui->lcdNumberCrossWind2->display(-QString(headSpeed).toFloat());
+    */
+              }
+
+              QString ID(sensorID);
+              ui->widgetPlotWind2->graph(0)->removeDataBefore(t-m_dPlotTimeSec);
+              ui->widgetPlotWind2->graph(1)->removeDataBefore(t-m_dPlotTimeSec);
+              ui->labelSensorWind2->setText(ID);
+              ui->widgetPlotWind2->graph(0)->addData((float)t, -headSpeed.toFloat());
+              ui->widgetPlotWind2->graph(1)->addData((float)t, crossSpeed.toFloat());
+
+              if (m_dYScale == 0)
+              {
+                ui->widgetPlotWind2->rescaleAxes();
+              }
+              else
+              {
+                ui->widgetPlotWind2->yAxis->setRange(-m_dYScale,m_dYScale);
+              }
+              ui->widgetPlotWind2->xAxis->setRange((float)t,m_dPlotTimeSec, Qt::AlignRight);
+              ui->widgetPlotWind2->setTitle(ID);
+              ui->widgetPlotWind2->replot();
+            }
+          }
+          if (m_bDebugOutput)
+          {
+            QString text = QString(windString).simplified();
+            ui->textEditSerialInput->append(text);
+          }
+
+
+      }
+      else if (foundSTX)
+      {
+          windString.append(data);
+      }
+
+      //qDebug() << data;
+    }
+}
+
 void MainWindow::newReadyReadImplementation(QSerialPort& serial)
 {
-  if (serial.canReadLine())
+  int bytesAvailable = serial.bytesAvailable();
+
+  if (bytesAvailable < 29)
+  {
+      qDebug() << "Available = "  << bytesAvailable;
+      //return;
+      bool ok = serial.waitForReadyRead(100);
+      if (!ok)
+      {
+          serial.flush();
+          return;
+      }
+  }
+
+  if (/*serial.canReadLine()  &&*/ (bytesAvailable == 29))
   {
 
     QByteArray line = serial.readLine();
@@ -689,6 +917,7 @@ void MainWindow::newReadyReadImplementation(QSerialPort& serial)
       QDateTime timeDT(QDateTime::currentDateTimeUtc());
       float t = (float)timeDT.time().msecsSinceStartOfDay()/1000;
 
+      qDebug() << timeDT.currentDateTime();
       QString crossSpeed;
       QString headSpeed;
       QString sensorID;
@@ -700,18 +929,21 @@ void MainWindow::newReadyReadImplementation(QSerialPort& serial)
 
       //memcpy(&sensorID, &tmpStr[1],1);
       sensorID.append(line.mid(1,1));
+      //qDebug() << sensorID;
 
       //memcpy(crossSpeed, &tmpStr[3],7);
       crossSpeed.append(line.mid(3,7));
+      //qDebug() << crossSpeed;
 
       //memcpy(headSpeed, &tmpStr[11],7);
-      crossSpeed.append(line.mid(11,7));
+      headSpeed.append(line.mid(11,7));
+      //qDebug() << headSpeed;
 
       //memcpy(unit, &tmpStr[19],1);
       unit.append(line.mid(19,1));
 
       //memcpy(status, &tmpStr[21],2);
-      unit.append(line.mid(21,2));
+      status.append(line.mid(21,2));
 
       char WindID1;
       char WindID2;
@@ -743,7 +975,7 @@ void MainWindow::newReadyReadImplementation(QSerialPort& serial)
       {
         m_updateTimeValue = true;
       }
-      qDebug() << m_updateTimeValue;
+      //qDebug() << m_updateTimeValue;
       if (m_updateTimeValue)
       {
         ui->lcdNumberMessageJitter->display( (int)m_pElapsedTimerValue);
@@ -852,6 +1084,15 @@ void MainWindow::newReadyReadImplementation(QSerialPort& serial)
       }
 
 
+    }
+    else
+    {
+        double errors = ui->lcdNumberErrorCounter->value();
+        errors += 1.0;
+        ui->lcdNumberErrorCounter->display(errors);
+        qDebug() << "Error " << "  " << line << "  " << line.length();
+        //serial.readAll();
+        //serial.flush();
     }
 
 
