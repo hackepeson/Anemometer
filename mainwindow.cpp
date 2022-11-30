@@ -731,7 +731,7 @@ void MainWindow::CharReadyRead(QSerialPort &serial)
             foundCompleteString = true;
 
             qDebug() << windString;
-            if (m_bUpdateValues && !m_bLockLCD)
+            if (m_bUpdateValues || m_bLockLCD)
             {
                 ui->textEditSerialInput->append(windString);
             }
