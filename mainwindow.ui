@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>831</width>
-    <height>812</height>
+    <width>649</width>
+    <height>646</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -65,6 +65,16 @@
              <string>Poll message</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Error counter</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLCDNumber" name="lcdNumberErrorCounter"/>
           </item>
           <item>
            <widget class="QGroupBox" name="groupBox">
@@ -261,7 +271,7 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    </active>
+                   </active>
                    <inactive>
                     <colorrole role="WindowText">
                      <brush brushstyle="SolidPattern">
@@ -398,7 +408,6 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    
                    </inactive>
                    <disabled>
                     <colorrole role="WindowText">
@@ -536,7 +545,6 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                   
                    </disabled>
                   </palette>
                  </property>
@@ -780,7 +788,6 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    
                    </active>
                    <inactive>
                     <colorrole role="WindowText">
@@ -918,7 +925,6 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                   
                    </inactive>
                    <disabled>
                     <colorrole role="WindowText">
@@ -1056,7 +1062,6 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    
                    </disabled>
                   </palette>
                  </property>
@@ -1318,7 +1323,6 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    
                    </active>
                    <inactive>
                     <colorrole role="WindowText">
@@ -1456,7 +1460,6 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    
                    </inactive>
                    <disabled>
                     <colorrole role="WindowText">
@@ -1594,7 +1597,6 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                   
                    </disabled>
                   </palette>
                  </property>
@@ -1785,7 +1787,6 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    
                    </active>
                    <inactive>
                     <colorrole role="WindowText">
@@ -1923,7 +1924,6 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    
                    </inactive>
                    <disabled>
                     <colorrole role="WindowText">
@@ -2061,7 +2061,6 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
                       </color>
                      </brush>
                     </colorrole>
-                    
                    </disabled>
                   </palette>
                  </property>
@@ -2114,8 +2113,8 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>831</width>
-     <height>26</height>
+     <width>649</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuCommunication">
